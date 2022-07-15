@@ -5,6 +5,7 @@ import (
 	gsrpc "github.com/centrifuge/go-substrate-rpc-client/v4"
 	"github.com/centrifuge/go-substrate-rpc-client/v4/types"
 	"github.com/stretchr/testify/assert"
+	"log"
 	"testing"
 )
 
@@ -36,11 +37,14 @@ func TestDecodeEvent(t *testing.T) {
 	// 类型映射关系   rust u32 => go types.U32
 	// 				AccountId => go types.AccountId
 
-	api, err := gsrpc.NewSubstrateAPI("wss://ws.test.hamsternet.io")
+	api, err := gsrpc.NewSubstrateAPI("ws://localhost:9944")
+	//api, err := gsrpc.NewSubstrateAPI("wss://polkadot.authright-test.newtouch.com")
 	meta, err := api.RPC.State.GetMetadataLatest()
 	assert.NoError(t, err)
 	// 836379 成功区块号， 836391 失败区块号
-	bh, err := api.RPC.Chain.GetBlockHash(836391)
+	//bh, err := api.RPC.Chain.GetBlockHash(836391)
+	//bh, err := api.RPC.Chain.GetBlockHash(1588736)
+	bh, err := api.RPC.Chain.GetBlockHash(9)
 	assert.NoError(t, err)
 	key, err := types.CreateStorageKey(meta, "System", "Events", nil)
 	assert.NoError(t, err)
@@ -54,4 +58,7 @@ func TestDecodeEvent(t *testing.T) {
 	err = DecodeEventRecordsWithIgnoreError(types.EventRecordsRaw(*raw), meta, &events)
 
 	fmt.Println(events)
+	if err != nil {
+		log.Fatalln(err)
+	}
 }
