@@ -113,7 +113,7 @@ type MyEventRecords struct {
 	Market_Money                                  []EventMarketMoney
 }
 
-func DecodeEventRecordsWithIgnoreError(e types.EventRecordsRaw, m *types.Metadata, t interface{}) error {
+func decodeEventRecordsWithIgnoreError(e types.EventRecordsRaw, m *types.Metadata, t interface{}) error {
 	fmt.Println(fmt.Sprintf("will decode event records from raw hex: %#x", e))
 
 	// ensure t is a pointer
@@ -230,61 +230,4 @@ func DecodeEventRecordsWithIgnoreError(e types.EventRecordsRaw, m *types.Metadat
 		}
 	}
 	return nil
-}
-
-func getNewStructWithEventInfo(m *types.Metadata, moduleName types.Text, eventName types.Text) (reflect.Value, error) {
-	var ts []reflect.Type
-	for _, mod := range m.AsMetadataV13.Modules {
-		if mod.Name == moduleName {
-			for _, event := range mod.Events {
-				if event.Name == eventName {
-					ts = append(ts, reflect.TypeOf(types.Phase{}))
-					for _, arg := range event.Args {
-						a, ok := TypeMap[string(arg)]
-						if !ok {
-							err := fmt.Errorf("unable to find type for arg %v of event %v_%v", arg, moduleName, eventName)
-							return reflect.Value{}, err
-						}
-						ts = append(ts, a)
-					}
-					ts = append(ts, reflect.TypeOf([]types.Hash{}))
-				}
-			}
-		}
-	}
-	newStruct := makeStruct(ts...)
-	return newStruct, nil
-}
-
-func makeStruct(ts ...reflect.Type) reflect.Value {
-	var sfs []reflect.StructField
-	for i, t := range ts {
-		sf := reflect.StructField{
-			Name: fmt.Sprintf("F%d", i+1),
-			Type: t,
-		}
-		sfs = append(sfs, sf)
-	}
-	st := reflect.StructOf(sfs)
-	so := reflect.New(st)
-	return so
-}
-
-var TypeMap = map[string]reflect.Type{
-	"u8":      reflect.TypeOf(types.U8(0)),
-	"u16":     reflect.TypeOf(types.U16(0)),
-	"u32":     reflect.TypeOf(types.U32(0)),
-	"u64":     reflect.TypeOf(types.U64(0)),
-	"u128":    reflect.TypeOf(types.U128{}),
-	"u256":    reflect.TypeOf(types.U256{}),
-	"i8":      reflect.TypeOf(types.I8(0)),
-	"i16":     reflect.TypeOf(types.I16(0)),
-	"i32":     reflect.TypeOf(types.I32(0)),
-	"i64":     reflect.TypeOf(types.I64(0)),
-	"i128":    reflect.TypeOf(types.I128{}),
-	"i256":    reflect.TypeOf(types.I256{}),
-	"bool":    reflect.TypeOf(types.Bool(false)),
-	"text":    reflect.TypeOf(types.Text("")),
-	"hash":    reflect.TypeOf(types.Hash{}),
-	"address": reflect.TypeOf(types.Address{}),
 }
