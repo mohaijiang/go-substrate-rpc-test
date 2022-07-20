@@ -33,6 +33,9 @@ var TypeMap = map[string]reflect.Type{
 	"T::Balance":              reflect.TypeOf(types.U128{}),
 	"ElectionCompute":         reflect.TypeOf(types.ElectionCompute(0)),
 	"Option<ElectionCompute>": reflect.TypeOf(types.NewOptionU8(types.U8(0))),
+	"Vec<u8>":                 reflect.TypeOf([]types.U8{}),
+	"BoundedVec<u8, frame_support::traits::ConstU32<64>>": reflect.TypeOf([64]types.U8{}),
+	"<<T as Config>::Time as Time>::Moment":               reflect.TypeOf(types.Moment{}),
 }
 
 func DecodeEventRecordsWithIgnoreError(e types.EventRecordsRaw, m *types.Metadata, t interface{}) error {
