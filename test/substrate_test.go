@@ -521,7 +521,7 @@ func TestDecodeEvent(t *testing.T) {
 		190584,
 		191734,
 	}
-	numSet = []uint64{144015}
+	numSet = []uint64{1762312}
 	for _, num := range numSet {
 		fmt.Println("num:", num)
 		bh, err := api.RPC.Chain.GetBlockHash(num)
